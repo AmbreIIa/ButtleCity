@@ -10,20 +10,11 @@ TILE = 50
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
-fontUI = pygame.font.Font(None, 30)
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
-class UI:
-    def draw(self):
-        i = 0
-        for obj in objects:
-            if obj.type == 'tank':
-                pygame.draw.rect(window, obj.color, (5 + i * 70, 5, 22, 22))
-                text = fontUI.render(str(obj.hp), 1, obj.color)
-                rect = text.get_rect(center=(5 + i * 70 + 32, 5 + 11))
-                window.blit(text, rect)
-                i += 1
+
+
 
 class Tank:
     def __init__(self, color, px, py, direct, keyList):
@@ -44,25 +35,25 @@ class Tank:
         oldX, oldY = self.rect.topleft
 
         if keys[self.keyLEFT]:
-            if self.rect.left > 0:  
+            if self.rect.left > 0:
                 self.rect.x -= self.moveSpeed
                 self.direct = 3
         elif keys[self.keyRIGHT]:
-            if self.rect.right < WIDTH: 
+            if self.rect.right < WIDTH:
                 self.rect.x += self.moveSpeed
                 self.direct = 1
         elif keys[self.keyUP]:
-            if self.rect.top > 0: 
+            if self.rect.top > 0:
                 self.rect.y -= self.moveSpeed
                 self.direct = 0
         elif keys[self.keyDOWN]:
-            if self.rect.bottom < HEIGHT: 
+            if self.rect.bottom < HEIGHT:
                 self.rect.y += self.moveSpeed
                 self.direct = 2
 
         for obj in objects:
             if obj != self and self.rect.colliderect(obj.rect):
-                self.rect.topleft = oldX, oldY 
+                self.rect.topleft = oldX, oldY
 
         if keys[self.keySHOT] and self.shotTimer == 0:
             self.shoot()
@@ -72,7 +63,8 @@ class Tank:
 
     def shoot(self):
         dx, dy = DIRECTS[self.direct]
-        Bullet(self, self.rect.centerx, self.rect.centery, dx * self.bulletSpeed, dy * self.bulletSpeed, self.bulletDamage)
+        Bullet(self, self.rect.centerx, self.rect.centery, dx * self.bulletSpeed, dy * self.bulletSpeed,
+               self.bulletDamage)
         self.shotTimer = self.shotDelay
 
     def draw(self):
@@ -85,6 +77,7 @@ class Tank:
         if self.hp <= 0:
             objects.remove(self)
             print(self.color, 'dead')
+
 
 class AITank(Tank):
     def __init__(self, color, px, py):
@@ -99,12 +92,11 @@ class AITank(Tank):
         new_x = self.rect.x + DIRECTS[self.direct][0] * self.moveSpeed
         new_y = self.rect.y + DIRECTS[self.direct][1] * self.moveSpeed
 
-       
         if 0 <= new_x <= WIDTH - TILE and 0 <= new_y <= HEIGHT - TILE:
             self.rect.x = new_x
             self.rect.y = new_y
         else:
-            self.direct = choice(range(4))  
+            self.direct = choice(range(4))
 
         for obj in objects:
             if obj != self and self.rect.colliderect(obj.rect):
@@ -139,6 +131,7 @@ class Bullet:
     def draw(self):
         pygame.draw.circle(window, 'yellow', (self.px, self.py), 2)
 
+
 class Block:
     def __init__(self, px, py, size):
         objects.append(self)
@@ -146,7 +139,7 @@ class Block:
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 1
 
-    def damage(self, value): 
+    def damage(self, value):
         self.hp -= value
         if self.hp <= 0:
             objects.remove(self)
@@ -155,11 +148,12 @@ class Block:
         pygame.draw.rect(window, 'green', self.rect)
         pygame.draw.rect(window, 'gray20', self.rect, 2)
 
+
 bullets = []
 objects = []
 Tank('blue', 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
 AITank('red', 650, 275)
-ui = UI()
+
 
 LEVEL_MAP = [
     [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
@@ -167,6 +161,10 @@ LEVEL_MAP = [
     [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0],
     [1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
     [0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1],
+    [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    [0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1],
     [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1],
     [0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1],
     [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
@@ -179,7 +177,6 @@ for row_idx, row in enumerate(LEVEL_MAP):
     for col_idx, cell in enumerate(row):
         if cell == 1:
             Block(col_idx * MAP_TILE_SIZE, row_idx * MAP_TILE_SIZE, MAP_TILE_SIZE)
-
 
 play = True
 while play:
@@ -194,7 +191,6 @@ while play:
     window.fill('black')
     for bullet in bullets: bullet.draw()
     for obj in objects: obj.draw()
-    ui.draw()
     pygame.display.update()
     clock.tick(FPS)
 pygame.quit()
