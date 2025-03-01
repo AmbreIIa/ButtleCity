@@ -59,7 +59,7 @@ class Tank:
             self.shoot()
 
         if self.shotTimer > 0:
-            self.shotTimer -= 1
+            self.shotTimer -= 3
 
     def shoot(self):
         dx, dy = DIRECTS[self.direct]
@@ -104,7 +104,7 @@ class AITank(Tank):
 
         self.moveTimer -= 1
 
-        if randint(0, 100) < 3:
+        if randint(0, 1000) < 10:
             self.shoot()
 
 
@@ -151,7 +151,7 @@ class Block:
 
 bullets = []
 objects = []
-Tank('blue', 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
+Tank('blue', 125, 250, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
 AITank('red', 650, 275)
 
 
